@@ -18,6 +18,11 @@ int main (int argc, char *argv[]) {
 
     NetDeviceContainer devices = p2p.Install (nodes);
 
+    // 1. Install Internet Stack FIRST (This creates the default queue discs)
+    InternetStackHelper stack;
+    stack.Install (nodes);
+
+    // 2. NOW Configure and Install RED Queue
     TrafficControlHelper tch;
     tch.Uninstall (devices);
     tch.SetRootQueueDisc ("ns3::RedQueueDisc", 
@@ -26,9 +31,6 @@ int main (int argc, char *argv[]) {
                           "LinkBandwidth", StringValue ("10Mbps"),
                           "LinkDelay", StringValue ("2ms"));
     tch.Install (devices);
-
-    InternetStackHelper stack;
-    stack.Install (nodes);
 
     Ipv4AddressHelper address;
     address.SetBase ("10.1.1.0", "255.255.255.0");
